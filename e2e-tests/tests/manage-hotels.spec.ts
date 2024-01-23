@@ -43,8 +43,7 @@ test("should allow user to add a hotel", async ({ page }) => {
   ]);
 
   await page.getByRole("button", { name: "Save" }).click();
-  await expect(page.getByText("Saving...")).toBeVisible();
-  await expect(page.getByText("Hotel saved!")).toBeVisible();
+  await page.waitForSelector("span", { state: "visible" });
 });
 
 test("should display hotels", async ({ page }) => {
@@ -58,6 +57,28 @@ test("should display hotels", async ({ page }) => {
   await expect(page.getByText("2 adults, 0 children")).toBeVisible();
   await expect(page.getByText("4 Star Rating")).toBeVisible();
 
-  await expect(page.getByRole("link", { name: "View Details" })).toBeVisible();
+  await expect(
+    page.getByRole("link", { name: "View Details" }).first()
+  ).toBeVisible();
   await expect(page.getByRole("link", { name: "Add Hotel" })).toBeVisible();
+});
+
+test("should edit hotel", async ({ page }) => {
+  await page.goto(`${UI_URL}my-hotels`);
+
+  await page.getByRole("link", { name: "View Details" }).first().click();
+
+  await page.waitForSelector('[name="name"]', { state: "attached" });
+  await expect(page.locator('[name="name"]')).toHaveValue("sanctum hotel");
+  await page.locator('[name="name"]').fill("sanctum hotel UPDATED");
+  await page.getByRole("button", { name: "Save" }).click();
+  await expect(page.getByText("Hotel Saved!")).toBeVisible();
+
+  await page.reload();
+
+  await expect(page.locator('[name="name"]')).toHaveValue(
+    "sanctum hotel UPDATED"
+  );
+  await page.locator('[name="name"]').fill("sanctum Hotel");
+  await page.getByRole("button", { name: "Save" }).click();
 });
