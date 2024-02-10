@@ -60,6 +60,18 @@ router.get("/search", async (req: Request, res: Response) => {
   }
 });
 
+// add verifyToken only when the user has to logged in to access the page
+router.get("/", async (req: Request, res: Response) => {
+  try {
+    // sorted the hotel based on the lastUpdated
+    const hotels = await Hotel.find().sort("-lastUpdated");
+    res.json(hotels);
+  } catch (error) {
+    console.log("error", error);
+    res.status(500).json({ message: "Error fetching hotels data" });
+  }
+});
+
 // /api/hotels/:id
 router.get(
   "/:id",
